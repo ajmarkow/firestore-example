@@ -1,12 +1,20 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Ticket from "./Ticket";
+import {useSelector} from 'react-redux';
+import {useFirestoreConnect,isLoaded,isEmpty} from 'react-redux-firebase';
 
 function TicketList(props){
-  return (
+
+  useFirestoreConnect([{collection: 'tickets'}
+]);
+
+const tickets = useSelector(state => state.firestore.ordered.tickets);
+if (isLoaded(tickets)){
+return (
     <React.Fragment>
       <hr/>
-      {Object.values(props.ticketList).map((ticket) => {
+      {tickets.map((ticket) => {
         return <Ticket
           whenTicketClicked = { props.onTicketSelection }
           names={ticket.names}
@@ -18,10 +26,16 @@ function TicketList(props){
       })}
     </React.Fragment>
   );
+} else {
+  return(
+    <React.Fragment>
+      <h1>LOADING!</h1>
+    </React.Fragment>
+  )
+}
 }
 
 TicketList.propTypes = {
-  ticketList: PropTypes.object,
   onTicketSelection: PropTypes.func
 };
 
